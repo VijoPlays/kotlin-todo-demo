@@ -2,6 +2,7 @@ package com.kotlin.vijo.todoapi.kotlintodoapi.controller
 
 import com.kotlin.vijo.todoapi.kotlintodoapi.model.TodoListObject
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -46,6 +47,17 @@ class TodoListControllerTest {
         Assertions.assertThat(res)
             .usingRecursiveComparison()
             .isEqualTo(ResponseEntity.status(HttpStatus.NO_CONTENT).body(null));
+    }
+
+    @Test
+    fun get_Invalid_TodoListID_Returns_BadRequest() {
+        //Arrange
+
+        //Act
+        val res = todoListController.readTodoList("someInvalidID")
+
+        //Assert
+        assertEquals(HttpStatus.BAD_REQUEST, res.statusCode)
     }
 
     //Create Tests

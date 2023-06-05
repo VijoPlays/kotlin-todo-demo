@@ -10,20 +10,33 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
+/**
+ * Controller class for TodoObjects.
+ */
 @RestController
 class TodoController {
+    /**
+     * Attempts to retrieve a TodoObject from the database, based on the provided ID.
+     */
     @GetMapping(value = ["/todo"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun readTodo(@RequestParam("id") id: String): ResponseEntity<TodoObject?> {
-        val uid = UUID.fromString(id)
+    fun readTodo(@RequestParam("id") id: String): ResponseEntity<Any> {
+        return try {
+            val uid = UUID.fromString(id)
 
-        val todo = readTodoObject(uid)
-        return if(todo != null) {
-            ResponseEntity.ok(todo)
-        } else {
-            ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
+            val todo = readTodoObject(uid)
+            if (todo != null) {
+                ResponseEntity.ok(todo)
+            } else {
+                ResponseEntity.status(HttpStatus.NO_CONTENT).body(null)
+            }
+        } catch (e: IllegalArgumentException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The provided ID was not of UUID format!")
         }
     }
 
+    /**
+     * Creates a TodoObject based on the provided parameters.
+     */
     @PostMapping(value = ["/todo"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun createTodo(@RequestBody todoObject: TodoObject): ResponseEntity<TodoObject> {
         val todo = createTodoObject(todoObject)
@@ -31,6 +44,9 @@ class TodoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(todo)
     }
 
+    /**
+     * Updates a TodoObject based on the provided parameters.
+     */
     @PatchMapping(value = ["/todo"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun updateTodo(@RequestBody todoObject: TodoObject): ResponseEntity<TodoObject?> {
         val todo = updateTodoObject(todoObject)
